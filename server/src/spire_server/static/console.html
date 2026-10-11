@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPIRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f1ec;
+      --ink: #1b1a19;
+      --muted: #7a736c;
+      --line: rgba(27,26,25,.08);
+      --glass: rgba(255,255,255,.62);
+      --glass-2: rgba(255,255,255,.78);
+      --sakura: #d9486f;
+      --sakura-soft: #f7d6de;
+      --ok: #1f8a5b;
+      --warn: #c4891a;
+      --bad: #c43c3c;
+      --shadow: 0 20px 60px rgba(40,24,20,.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: Manrope, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 500px at 10% -10%, #ffe4ea 0%, transparent 50%),
+        radial-gradient(700px 400px at 110% 10%, #efe7ff 0%, transparent 46%),
+        var(--bg);
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+      opacity: .35;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .petal {
+      position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 12px 2px 12px 2px;
+      background: #f3b3c2; opacity: .45; pointer-events: none; animation: fall linear infinite;
+    }
+    @keyframes fall { to { transform: translate3d(40px, 110vh, 0) rotate(220deg); opacity: 0; } }
+    .gate { min-height: 100%; display: grid; place-items: center; padding: 32px; }
+    .gate-card {
+      width: min(860px, 100%);
+      display: grid; grid-template-columns: 1.05fr .95fr;
+      background: var(--glass-2);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+    }
+    .gate-art { position: relative; min-height: 460px; background: #efe8e2; }
+    .gate-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+    .gate-art span {
+      position: absolute; left: 22px; bottom: 20px;
+      font-family: "Cormorant Garamond", serif; font-size: 28px; color: #fff;
+      text-shadow: 0 8px 24px rgba(0,0,0,.28);
+    }
+    .gate-form { padding: 48px 40px; }
+    .mark { letter-spacing: .28em; font-size: 11px; font-weight: 700; color: var(--sakura); }
+    h1 { font-family: "Cormorant Garamond", serif; font-size: 44px; font-weight: 500; margin: 12px 0 8px; }
+    .hint { color: var(--muted); line-height: 1.5; margin-bottom: 28px; }
+    input {
+      width: 100%; border: 1px solid var(--line); background: rgba(255,255,255,.7);
+      border-radius: 14px; padding: 13px 14px; outline: none;
+    }
+    input:focus { border-color: #e7a0b2; box-shadow: 0 0 0 4px rgba(217,72,111,.12); }
+    .btn {
+      border: 0; background: var(--ink); color: #fff; border-radius: 999px;
+      padding: 12px 18px; font-weight: 600; transition: transform .2s ease, opacity .2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    .btn.sakura { background: var(--sakura); }
+    .btn.small { padding: 7px 12px; font-size: 12px; }
+    .err { color: var(--bad); font-size: 13px; min-height: 18px; margin-top: 10px; }
+    .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100%; }
+    aside {
+      padding: 26px 16px;
+      border-right: 1px solid var(--line);
+      background: rgba(255,255,255,.38);
+      backdrop-filter: blur(18px);
+    }
+    .side-hero { width: 100%; height: 148px; object-fit: cover; object-position: 50% 18%; border-radius: 20px; margin: 16px 0 22px; }
+    aside nav { display: grid; gap: 6px; }
+    aside button {
+      text-align: left; border: 0; background: transparent; color: var(--muted);
+      padding: 10px 12px; border-radius: 12px;
+    }
+    aside button.active { background: #fff; color: var(--ink); box-shadow: 0 8px 20px rgba(40,24,20,.05); }
+    header.top {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 28px; border-bottom: 1px solid var(--line);
+    }
+    header.top h2 { margin: 0; font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 30px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 22px 28px 0; }
+    .kpi {
+      background: var(--glass); border: 1px solid var(--line); border-radius: 20px;
+      padding: 18px; backdrop-filter: blur(16px);
+    }
+    .kpi span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+    .kpi strong { display: block; margin-top: 8px; font-size: 30px; font-weight: 600; }
+    main { padding: 22px 28px 48px; }
+    .panel, table { background: var(--glass); border: 1px solid var(--line); border-radius: 22px; backdrop-filter: blur(16px); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; font-size: 13.5px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; padding: 14px 16px; }
+    td { padding: 13px 16px; border-top: 1px solid var(--line); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .online { background: var(--ok); } .stale { background: var(--warn); } .offline { background: #b3ada6; }
+    .sev-high, .sev-critical { color: var(--bad); } .sev-medium { color: var(--warn); }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .muted { color: var(--muted); }
+    .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    .hidden { display: none !important; }
+    label.sw { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .term { background: #1b1a19; color: #f6f1ea; border-radius: 16px; padding: 14px; margin-top: 8px; white-space: pre-wrap; word-break: break-word; font-family: "IBM Plex Mono", monospace; font-size: 12px; max-height: 280px; overflow: auto; }
+    .cmd-item { padding: 12px 0; border-top: 1px solid var(--line); }
+    .panel { padding: 18px; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+    .chip, .chip-btn {
+      border: 1px solid var(--line); background: rgba(255,255,255,.7); color: var(--ink);
+      border-radius: 999px; padding: 7px 12px; font-size: 12px;
+    }
+    .chip-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .split { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items: start; }
+    .list-card {
+      background: var(--glass); border: 1px solid var(--line); border-radius: 18px;
+      padding: 14px 16px; cursor: pointer; margin-bottom: 8px;
+    }
+    .list-card:hover, .list-card.on { background: #fff; box-shadow: 0 10px 24px rgba(40,24,20,.05); }
+    .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 600; }
+    .b-open { background: #f7d6de; color: #9a2848; }
+    .b-ack { background: #efe7ff; color: #5b4b8a; }
+    .b-closed { background: #e7efe8; color: #1f8a5b; }
+    .b-high, .b-critical { background: #fde8e8; color: var(--bad); }
+    .b-medium { background: #fff1d6; color: #9a6a10; }
+    .b-low, .b-info { background: #eceae6; color: #5e5852; }
+    .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+    .empty strong { display: block; color: var(--ink); font-family: "Cormorant Garamond", serif; font-size: 28px; font-weight: 500; margin-bottom: 6px; }
+    .detail h3 { font-family: "Cormorant Garamond", serif; font-size: 26px; font-weight: 500; margin: 0 0 8px; }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; font-size: 13px; margin: 14px 0; }
+    .policy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .policy-card { background: var(--glass); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; }
+    .policy-card h4 { margin: 0 0 4px; font-size: 15px; }
+    .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+    .switch input { display: none; }
+    .switch i { position: absolute; inset: 0; background: #ddd7d0; border-radius: 999px; transition: .2s; }
+    .switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: .2s; }
+    .switch input:checked + i { background: var(--sakura); }
+    .switch input:checked + i::after { transform: translateX(18px); }
+    .savebar { position: sticky; bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--glass-2); border: 1px solid var(--line); border-radius: 18px; padding: 12px 16px; backdrop-filter: blur(16px); }
+    @media (max-width: 900px) {
+      .gate-card, .shell { grid-template-columns: 1fr; }
+      .gate-art { min-height: 220px; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .split, .policy-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="petal" style="left:8%; animation-duration:11s"></div>
+  <div class="petal" style="left:26%; animation-duration:14s; animation-delay:2s; background:#f8c9d4"></div>
+  <div class="petal" style="left:61%; animation-duration:12s; animation-delay:4s"></div>
+  <div class="petal" style="left:84%; animation-duration:16s; animation-delay:1s; background:#ead7dc"></div>
+
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <div class="gate-art">
+        <img src="/assets/mascot.jpg" alt="">
+        <span>見張り</span>
+      </div>
+      <div class="gate-form">
+        <div class="mark">SPIRE EDR</div>
+        <h1>Консоль</h1>
+        <p class="hint">Тихое рабочее место оператора. Хосты, инциденты, политика и live response — без лишнего шума.</p>
+        <input id="token" type="password" placeholder="Admin token">
+        <div style="height:14px"></div>
+        <button class="btn sakura" onclick="login()">Войти</button>
+        <div id="gate-err" class="err"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app" class="shell hidden">
+    <aside>
+      <div class="mark">SPIRE</div>
+      <img class="side-hero" src="/assets/mascot.jpg" alt="">
+      <nav>
+        <button class="active" data-view="overview" onclick="show('overview')">Обзор</button>
+        <button data-view="agents" onclick="show('agents')">Агенты</button>
+        <button data-view="alerts" onclick="show('alerts')">Инциденты</button>
+        <button data-view="events" onclick="show('events')">События</button>
+        <button data-view="policy" onclick="show('policy')">Политика</button>
+      </nav>
+    </aside>
+    <section>
+      <header class="top">
+        <h2 id="title">Обзор</h2>
+        <span class="muted" id="clock"></span>
+        <div class="row" style="margin-left:auto">
+          <button class="btn ghost small" onclick="refresh()">Обновить</button>
+          <button class="btn ghost small" onclick="logout()">Выйти</button>
+        </div>
+      </header>
+      <div class="kpis">
+        <div class="kpi"><span>Хосты</span><strong id="k-agents">0</strong></div>
+        <div class="kpi"><span>Online</span><strong id="k-online">0</strong></div>
+        <div class="kpi"><span>Инциденты</span><strong id="k-alerts">0</strong></div>
+        <div class="kpi"><span>События</span><strong id="k-events">0</strong></div>
+      </div>
+      <main>
+        <div id="view-overview"><div id="ov-alerts"></div></div>
+        <div id="view-agents" class="hidden">
+          <table><thead><tr><th>Хост</th><th>ОС</th><th>Статус</th><th>Версия</th><th></th></tr></thead><tbody id="tb-agents"></tbody></table>
+          <div id="agent-box" class="panel hidden" style="margin-top:16px">
+            <div class="row"><strong id="ag-name"></strong><span class="mono muted" id="ag-id"></span></div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn small" onclick="sendCmd('ping')">Ping</button>
+              <button class="btn small" onclick="sendCmd('collect_inventory')">Inventory</button>
+              <input id="scan-path" placeholder="/path/to/scan" style="max-width:260px">
+              <button class="btn ghost small" onclick="sendCmd('scan_path')">Сканировать</button>
+            </div>
+            <div id="ag-cmds"></div>
+          </div>
+        </div>
+        <div id="view-alerts" class="hidden">
+          <div class="toolbar">
+            <input id="alert-q" placeholder="Поиск по названию" style="max-width:260px" oninput="renderAlerts()">
+            <button class="chip-btn active" data-af="all" onclick="setAlertFilter('all')">Все</button>
+            <button class="chip-btn" data-af="open" onclick="setAlertFilter('open')">Открытые</button>
+            <button class="chip-btn" data-af="ack" onclick="setAlertFilter('ack')">Принятые</button>
+            <button class="chip-btn" data-af="closed" onclick="setAlertFilter('closed')">Закрытые</button>
+          </div>
+          <div class="split">
+            <div id="alert-list"></div>
+            <div id="alert-detail" class="panel detail"><div class="empty"><strong>Инцидент</strong>Выберите карточку слева</div></div>
+          </div>
+        </div>
+        <div id="view-events" class="hidden">
+          <div class="toolbar">
+            <input id="event-q" placeholder="Поиск по типу или payload" style="max-width:260px" oninput="renderEvents()">
+            <button class="chip-btn active" data-ef="all" onclick="setEventFilter('all')">Все</button>
+            <button class="chip-btn" data-ef="detection" onclick="setEventFilter('detection')">Детекции</button>
+            <button class="chip-btn" data-ef="heartbeat" onclick="setEventFilter('heartbeat')">Heartbeat</button>
+            <button class="chip-btn" data-ef="command_result" onclick="setEventFilter('command_result')">Команды</button>
+            <button class="chip-btn" data-ef="file_event" onclick="setEventFilter('file_event')">Файлы</button>
+          </div>
+          <div class="split">
+            <div id="event-list"></div>
+            <div id="event-detail" class="panel detail"><div class="empty"><strong>Событие</strong>Выберите строку слева</div></div>
+          </div>
+        </div>
+        <div id="view-policy" class="hidden">
+          <p class="muted" style="margin-top:0">Политика применяется ко всем агентам. Они подхватывают её примерно раз в минуту.</p>
+          <div class="policy-grid">
+            <div class="policy-card"><div class="row"><div><h4>Heartbeat</h4><div class="muted">Живой сигнал хоста</div></div><label class="switch"><input id="p-hb" type="checkbox"><i></i></label></div>
+            <div class="policy-card"><div class="row"><div><h4>Host info</h4><div class="muted">Имя, ОС, версия агента</div></div><label class="switch"><input id="p-hi" type="checkbox"><i></i></label></div>
+            <div class="policy-card"><div class="row"><div><h4>Детекции</h4><div class="muted">Угрозы и YARA</div></div><label class="switch"><input id="p-det" type="checkbox"><i></i></label></div>
+            <div class="policy-card"><div class="row"><div><h4>Результаты команд</h4><div class="muted">Ответы live response</div></div><label class="switch"><input id="p-cr" type="checkbox"><i></i></label></div>
+            <div class="policy-card"><div class="row"><div><h4>File events</h4><div class="muted">Шумные create/modify</div></div><label class="switch"><input id="p-fe" type="checkbox"><i></i></label></div>
+            <div class="policy-card"><div class="row"><div><h4>Clean scans</h4><div class="muted">Чистые файлы не нужны в ленте</div></div><label class="switch"><input id="p-cs" type="checkbox"><i></i></label></div>
+          </div>
+          <div class="panel" style="margin-top:12px">
+            <div class="row"><div><h4 style="margin:0">Sample file events</h4><div class="muted">Доля файловых событий, если они включены</div></div><input id="p-sample" type="number" min="0" max="100" style="width:96px"></div>
+          </div>
+          <div class="savebar" style="margin-top:14px">
+            <div id="policy-msg" class="muted">Изменения не отправляются, пока не нажмёте сохранить.</div>
+            <button class="btn sakura" onclick="savePolicy()">Сохранить политику</button>
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
+<script>
+const titles = {overview:"Обзор", agents:"Агенты", alerts:"Инциденты", events:"События", policy:"Политика"};
+let selected = null;
+let cache = { agents: [], alerts: [], events: [] };
+let alertFilter = "all";
+let eventFilter = "all";
+let selectedAlert = null;
+let selectedEvent = null;
+function hostName(id){ return (cache.agents.find(a => a.id === id) || {}).hostname || id.slice(0,8); }
+function when(ts){ try { return new Date(ts).toLocaleString("ru-RU"); } catch(e){ return ts; } }
+const $ = (id) => document.getElementById(id);
+let adminToken = "";
+localStorage.removeItem("spire_admin");
+function headers(){ return { Authorization: "Bearer " + adminToken, "Content-Type":"application/json" }; }
+async function api(path, opt={}){
+  const res = await fetch(path, { ...opt, headers: { ...headers(), ...(opt.headers||{}) } });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function login(){
+  adminToken = $("token").value;
+  try {
+    await api("/v1/stats");
+    $("gate").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("token").value = "";
+    refresh();
+  } catch(e) {
+    $("gate-err").textContent = "Неверный токен";
+    adminToken = "";
+  }
+}
+function logout(){ adminToken = ""; location.reload(); }
+function show(name){
+  document.querySelectorAll("aside button").forEach(b => b.classList.toggle("active", b.dataset.view===name));
+  ["overview","agents","alerts","events","policy"].forEach(v => $("view-"+v).classList.toggle("hidden", v!==name));
+  $("title").textContent = titles[name];
+}
+async function refresh(){
+  $("clock").textContent = new Date().toLocaleString("ru-RU");
+  const [stats, agents, alerts, events, policy] = await Promise.all([
+    api("/v1/stats"), api("/v1/agents"), api("/v1/alerts"), api("/v1/events?limit=40"), api("/v1/policy")
+  ]);
+  $("k-agents").textContent = stats.agents;
+  $("k-online").textContent = stats.online;
+  $("k-alerts").textContent = stats.open_alerts;
+  $("k-events").textContent = stats.events;
+  cache.agents = agents; cache.alerts = alerts; cache.events = events;
+  $("tb-agents").innerHTML = agents.map(a => `<tr><td>${escapeHtml(a.hostname)}</td><td class="muted">${escapeHtml(a.os_name)}/${escapeHtml(a.arch)}</td><td><span class="dot ${escapeHtml(a.status)}"></span>${escapeHtml(a.status)}</td><td class="mono">${escapeHtml(a.agent_version)}</td><td><button class="btn ghost small" data-agent="${escapeHtml(a.id)}">Открыть</button></td></tr>`).join("") || `<tr><td colspan="5" class="muted">Нет агентов</td></tr>`;
+  renderAlerts();
+  renderEvents();
+  $("ov-alerts").innerHTML = alerts.slice(0,5).map(al => `<div class="list-card" onclick="show('alerts'); selectedAlert=${al.id}; renderAlerts();"><div class="row"><strong>${escapeHtml(al.title)}</strong><span class="badge b-${escapeHtml(al.severity)}">${escapeHtml(al.severity)}</span><span class="badge b-${escapeHtml(al.status)}">${escapeHtml(al.status)}</span></div><div class="muted">${escapeHtml(hostName(al.agent_id))}</div></div>`).join("") || `<div class="empty"><strong>Тихо</strong>Открытых инцидентов нет</div>`;
+  $("p-hb").checked = policy.send_heartbeat;
+  $("p-hi").checked = policy.send_host_info;
+  $("p-fe").checked = policy.send_file_events;
+  $("p-cs").checked = policy.send_clean_scans;
+  $("p-det").checked = policy.send_detections;
+  $("p-cr").checked = policy.send_command_results;
+  $("p-sample").value = policy.file_event_sample_percent;
+}
+function setAlertFilter(v){
+  alertFilter = v;
+  document.querySelectorAll("[data-af]").forEach(b => b.classList.toggle("active", b.dataset.af===v));
+  renderAlerts();
+}
+function setEventFilter(v){
+  eventFilter = v;
+  document.querySelectorAll("[data-ef]").forEach(b => b.classList.toggle("active", b.dataset.ef===v));
+  renderEvents();
+}
+function filteredAlerts(){
+  const q = ($("alert-q")?.value || "").toLowerCase();
+  return cache.alerts.filter(al =>
+    (alertFilter === "all" || al.status === alertFilter) &&
+    (!q || (al.title||"").toLowerCase().includes(q) || hostName(al.agent_id).toLowerCase().includes(q))
+  );
+}
+function filteredEvents(){
+  const q = ($("event-q")?.value || "").toLowerCase();
+  return cache.events.filter(ev =>
+    (eventFilter === "all" || ev.event_type === eventFilter) &&
+    (!q || ev.event_type.includes(q) || JSON.stringify(ev.payload||{}).toLowerCase().includes(q) || hostName(ev.agent_id).toLowerCase().includes(q))
+  );
+}
+function renderAlerts(){
+  const items = filteredAlerts();
+  $("alert-list").innerHTML = items.map(al => `
+    <div class="list-card ${selectedAlert===al.id?"on":""}" onclick="openAlert(${al.id})">
+      <div class="row"><strong>${escapeHtml(al.title)}</strong><span class="badge b-${escapeHtml(al.severity)}">${escapeHtml(al.severity)}</span></div>
+      <div class="muted">${escapeHtml(hostName(al.agent_id))} · ${escapeHtml(al.status)} · ${escapeHtml(when(al.created_at))}</div>
+    </div>`).join("") || `<div class="empty"><strong>Чисто</strong>Под фильтр ничего не попало</div>`;
+  if (selectedAlert) openAlert(selectedAlert);
+}
+function openAlert(id){
+  selectedAlert = id;
+  const al = cache.alerts.find(x => x.id === id);
+  document.querySelectorAll("#alert-list .list-card").forEach((el,i) => {});
+  if (!al) { $("alert-detail").innerHTML = `<div class="empty"><strong>Инцидент</strong>Не найден</div>`; return; }
+  $("alert-detail").innerHTML = `
+    <h3>${escapeHtml(al.title)}</h3>
+    <div class="row"><span class="badge b-${escapeHtml(al.severity)}">${escapeHtml(al.severity)}</span><span class="badge b-${escapeHtml(al.status)}">${escapeHtml(al.status)}</span></div>
+    <div class="kv">
+      <div class="muted">Хост</div><div>${escapeHtml(hostName(al.agent_id))}</div>
+      <div class="muted">Agent ID</div><div class="mono">${escapeHtml(al.agent_id)}</div>
+      <div class="muted">Event</div><div class="mono">${escapeHtml(al.event_id)}</div>
+      <div class="muted">Создан</div><div>${escapeHtml(when(al.created_at))}</div>
+    </div>
+    <div class="row">
+      <button class="btn small" onclick="patchAlert(${al.id},'ack')">Принять</button>
+      <button class="btn ghost small" onclick="patchAlert(${al.id},'closed')">Закрыть</button>
+      <button class="btn ghost small" onclick="patchAlert(${al.id},'open')">Открыть снова</button>
+      <button class="btn sakura small" data-agent="${escapeHtml(al.agent_id)}">К агенту</button>
+    </div>`;
+}
+function renderEvents(){
+  const items = filteredEvents();
+  $("event-list").innerHTML = items.map(ev => `
+    <div class="list-card ${selectedEvent===ev.event_id?"on":""}" data-event="${escapeHtml(ev.event_id)}">
+      <div class="row"><strong>${escapeHtml(ev.event_type)}</strong><span class="badge b-${escapeHtml(ev.severity)}">${escapeHtml(ev.severity)}</span></div>
+      <div class="muted">${escapeHtml(hostName(ev.agent_id))} · ${escapeHtml(when(ev.ts))}</div>
+    </div>`).join("") || `<div class="empty"><strong>Тишина</strong>Событий нет — проверьте политику</div>`;
+  if (selectedEvent) openEvent(selectedEvent);
+}
+function openEvent(id){
+  selectedEvent = id;
+  const ev = cache.events.find(x => x.event_id === id);
+  if (!ev) { $("event-detail").innerHTML = `<div class="empty"><strong>Событие</strong>Не найдено</div>`; return; }
+  $("event-detail").innerHTML = `
+    <h3>${escapeHtml(ev.event_type)}</h3>
+    <div class="row"><span class="badge b-${escapeHtml(ev.severity)}">${escapeHtml(ev.severity)}</span></div>
+    <div class="kv">
+      <div class="muted">Хост</div><div>${escapeHtml(hostName(ev.agent_id))}</div>
+      <div class="muted">Время</div><div>${escapeHtml(when(ev.ts))}</div>
+      <div class="muted">Получено</div><div>${escapeHtml(when(ev.received_at))}</div>
+      <div class="muted">ID</div><div class="mono">${escapeHtml(ev.event_id)}</div>
+    </div>
+    <div class="muted">Payload</div>
+    <div class="term">${escapeHtml(JSON.stringify(ev.payload || {}, null, 2))}</div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost small" data-agent="${escapeHtml(ev.agent_id)}">К агенту</button></div>`;
+}
+function renderResult(c){
+  const r = c.result || {};
+  if (c.command_type === "run") {
+    return `<div class="term">${escapeHtml("$ " + (r.command || "") + "\n" + (r.stdout || "") + (r.stderr ? "\n" + r.stderr : "") + (r.timeout ? "\n[timeout]" : "") + (r.exit_code != null ? "\nexit " + r.exit_code : ""))}</div>`;
+  }
+  if (c.command_type === "collect_inventory") {
+    const procs = (r.processes || []).slice(0, 40).map(p => `${p.pid}\t${p.name || ""}  ${p.cmdline || p.exe || ""}`).join("\n");
+    return `<div class="muted">${escapeHtml(r.hostname || "")} · processes ${escapeHtml(r.process_count || 0)}</div><div class="term">${escapeHtml(procs || JSON.stringify(r, null, 2))}</div>`;
+  }
+  return `<div class="term">${escapeHtml(JSON.stringify(r, null, 2))}</div>`;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+document.addEventListener("click", event => {
+  const agent = event.target.closest("[data-agent]");
+  const item = event.target.closest("[data-event]");
+  if (agent) openAgent(agent.dataset.agent, hostName(agent.dataset.agent));
+  if (item) openEvent(item.dataset.event);
+});
+async function openAgent(id, name){
+  selected = id; show("agents");
+  $("agent-box").classList.remove("hidden");
+  $("ag-name").textContent = name; $("ag-id").textContent = id;
+  const cmds = await api("/v1/agents/"+encodeURIComponent(id)+"/commands");
+  $("ag-cmds").innerHTML = cmds.map(c => `<div class="cmd-item"><div class="row"><strong>${escapeHtml(c.command_type)}</strong><span class="muted">${escapeHtml(c.status)}</span></div>${c.result ? renderResult(c) : '<div class="muted">ожидание ответа агента…</div>'}</div>`).join("") || '<div class="muted">Команд нет</div>';
+}
+async function sendCmd(type){
+  if (!selected) return;
+  const payload = type === "scan_path" ? { path: $("scan-path").value } : {};
+  await api("/v1/agents/"+encodeURIComponent(selected)+"/commands", { method:"POST", body: JSON.stringify({ command_type: type, payload }) });
+  const name = $("ag-name").textContent;
+  await openAgent(selected, name);
+  let n = 0;
+  const timer = setInterval(async () => {
+    n += 1;
+    await openAgent(selected, name);
+    const cmds = await api("/v1/agents/"+encodeURIComponent(selected)+"/commands");
+    if (!cmds.some(c => c.status === "queued" || c.status === "sent") || n > 15) clearInterval(timer);
+  }, 2000);
+}
+async function patchAlert(id, status){
+  await api("/v1/alerts/"+id, { method:"PATCH", body: JSON.stringify({ status }) });
+  refresh();
+}
+async function savePolicy(){
+  const body = {
+    send_heartbeat: $("p-hb").checked, send_host_info: $("p-hi").checked,
+    send_file_events: $("p-fe").checked, send_clean_scans: $("p-cs").checked,
+    send_detections: $("p-det").checked, send_command_results: $("p-cr").checked,
+    file_event_sample_percent: Number($("p-sample").value || 10),
+    heartbeat_interval_secs: 30, max_batch: 100
+  };
+  await api("/v1/policy", { method:"PUT", body: JSON.stringify(body) });
+  $("policy-msg").textContent = "Сохранено.";
+}
+setInterval(() => { if (!$("app").classList.contains("hidden")) refresh(); }, 15000);
+</script>
+</body>
+</html>

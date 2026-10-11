@@ -1,0 +1,29 @@
+[workspace]
+members = [
+    "haruspic_edr_cli",
+    "haruspic_edr_core",
+    "haruspic_edr_engine",
+    #"haruspic_edr_managment_console",
+    "haruspic_edr_tui",
+    "haruspic_edr_sensor",
+]
+resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0.100"
+chrono = "0.4.41"
+env_logger = "0.11.8"
+indicatif = "0.18.0"
+log = "0.4.27"
+
+[workspace.dependencies.clap]
+version = "4.5.48"
+features = ["derive"]
+
+[workspace.dependencies.reqwest]
+version = "0.12.22"
+features = ["blocking"]
+
+[workspace.dependencies.rusqlite]
+version = "0.37.0"
+features = ["bundled"]

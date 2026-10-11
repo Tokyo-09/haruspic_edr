@@ -1,0 +1,18 @@
+[package]
+name = "spire"
+version = "0.2.0"
+edition = "2024"
+
+[dependencies]
+av_core = { path = "../av_core" }
+av_engine = { path = "../av_engine" }
+
+clap.workspace = true
+log.workspace = true
+env_logger.workspace = true
+anyhow.workspace = true
+indicatif.workspace = true
+
+
+[build-dependencies]
+tonic-prost-build = "0.14.2"

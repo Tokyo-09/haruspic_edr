@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package spire;
+
+service Spire {
+  rpc ScanFile(ScanFileRequest) returns (ScanResult);
+  rpc ScanBuffer(ScanBufferRequest) returns (ScanResult);
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+  rpc Shutdown(ShutdownRequest) returns (ShutdownResponse);
+}
+
+message ScanFileRequest {
+  string path = 1;
+}
+
+message ScanBufferRequest {
+  bytes data = 1;
+}
+
+message ScanResult {
+  bool infected = 1;
+  string hash = 2;
+  repeated string matched_rules = 3;
+  string details = 4;
+}
+
+message GetStatusRequest {}
+
+message GetStatusResponse {
+  string status = 1;
+}
+
+message ShutdownRequest {}
+
+message ShutdownResponse {}

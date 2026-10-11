@@ -1,0 +1,12 @@
+[package]
+name = "av_tui"
+version = "0.2.0"
+description = "Av tui"
+authors = ["Tokyo-09 <Unit-09@proton.me>"]
+license = "MIT"
+edition = "2024"
+
+[dependencies]
+crossterm = "0.29.0"
+ratatui = "0.29.0"
+color-eyre = "0.6.3"

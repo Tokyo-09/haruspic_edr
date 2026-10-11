@@ -1,0 +1,23 @@
+# Signed feed settings and scan_limits are in config.json (working directory).
+
+# Исключённые пути
+excluded_paths = [
+    "/root/.local/share/fish/",
+    "/root/.spire",
+    "/root/.spire/data/",
+    "/root/.local/share/spire_quarantine/",
+]
+
+# Исключённые расширения файлов
+excluded_extensions = ["log", "tmp", "bak", "db"]
+
+# Исключённые имена файлов
+excluded_files = ["secret.txt", ".gitignore", "fish_history", ".bash_history"]
+
+excluded_processes = ["firefox", "chrome", "systemd"]
+
+telemetry = true
+telemetry_url = "http://127.0.0.1:8080"
+enrollment_token = ""
+# Detection-only by default. Set "quarantine" to enable response explicitly.
+response_policy = "observe"

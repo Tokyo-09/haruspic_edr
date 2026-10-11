@@ -1,0 +1,22 @@
+[Unit]
+Description=SpireAV Engine
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/spired -v
+WorkingDirectory=/etc/spire
+RuntimeDirectory=spire
+RuntimeDirectoryMode=0750
+User=root
+Group=spire
+Restart=on-failure
+RestartSec=10
+UMask=0077
+MemoryHigh=384M
+MemoryMax=512M
+CPUQuota=100%
+TasksMax=64
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
